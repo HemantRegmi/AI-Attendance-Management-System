@@ -1,0 +1,28 @@
+# Values for Development Environment
+
+backend:
+  replicaCount: 1
+  service:
+    type: NodePort
+  env:
+    - name: ENV
+      value: "development"
+    - name: DEBUG
+      value: "true"
+
+frontend:
+  replicaCount: 1
+  service:
+    type: NodePort
+
+ingress:
+  enabled: true
+  hosts:
+    - host: dev.ai-attendance.local
+      paths:
+        - path: /
+          pathType: Prefix
+          backend: frontend
+        - path: /api
+          pathType: Prefix
+          backend: backend

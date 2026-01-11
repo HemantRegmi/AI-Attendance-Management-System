@@ -1,0 +1,22 @@
+# Values for Test Environment
+
+backend:
+  replicaCount: 2
+  env:
+    - name: ENV
+      value: "test"
+
+frontend:
+  replicaCount: 2
+
+ingress:
+  enabled: true
+  hosts:
+    - host: test.ai-attendance.com
+      paths:
+        - path: /
+          pathType: Prefix
+          backend: frontend
+        - path: /api
+          pathType: Prefix
+          backend: backend

@@ -1,0 +1,42 @@
+# Default values for ai-attendance.
+
+backend:
+  replicaCount: 1
+  image:
+    repository: your-registry/ai-attendance-backend
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8000
+  resources: {}
+  env:
+    # Add environment variables here
+    # - name: DB_HOST
+    #   value: "postgres"
+
+frontend:
+  replicaCount: 1
+  image:
+    repository: your-registry/ai-attendance-frontend
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          backend: frontend
+        - path: /api
+          pathType: ImplementationSpecific
+          backend: backend
+  tls: []

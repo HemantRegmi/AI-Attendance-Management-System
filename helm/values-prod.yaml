@@ -1,0 +1,40 @@
+# Values for Production Environment
+
+backend:
+  replicaCount: 3
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  env:
+    - name: ENV
+      value: "production"
+
+frontend:
+  replicaCount: 3
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+ingress:
+  enabled: true
+  hosts:
+    - host: ai-attendance.com
+      paths:
+        - path: /
+          pathType: Prefix
+          backend: frontend
+        - path: /api
+          pathType: Prefix
+          backend: backend
+  tls:
+    - secretName: ai-attendance-tls
+      hosts:
+        - ai-attendance.com

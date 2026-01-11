@@ -1,0 +1,112 @@
+# Root .gitignore for full stack project
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+dist/
+
+# Environment and secrets
+*.env
+*.env.*
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Uploads (if not demo data)
+uploads/
+
+# Test files and folders
+tests/
+test/
+__tests__/
+*.test.js
+*.test.ts
+*.test.tsx
+*.spec.js
+*.spec.ts
+*.spec.tsx
+
+# Python development/testing files
+test_*.py
+*_test.py
+check_*.py
+debug_*.py
+analyze_*.py
+create_test_*.py
+create_*_data.py
+create_sample*.py
+*_debug.py
+*_check.py
+comprehensive_*.py
+simple_check*.py
+
+# Development utility scripts
+decode_*.py
+compare_*.py
+cleanup_*.py
+
+# Database files (keeping data private)
+*.db
+*.sqlite
+*.sqlite3
+
+# Markdown debug/development docs
+*_COMPLETE.md
+*_SUMMARY.md
+*_DIAGNOSIS.md
+*_DEBUG.md
+*_INSTRUCTIONS.md
+*_GUIDE.md
+*_NOTES.md
+*_FIXES*.md
+*_FIX*.md
+*_SOLUTION*.md
+*_OVERRIDE*.md
+*_OVERVIEW.md
+ATTENDANCE_CALCULATION_BUGS_REPORT.md
+CALENDAR_GENERATOR_SETUP.md
+CLASS_COUNT_STRATEGY.md
+HISTORICAL_DATA_BACKFILL_ANALYSIS.md
+PLANNED_VS_ACTUAL_CLASSES_IMPLEMENTATION.md   
+QUICK_START_DYNAMIC_CALENDAR.md
+SMART_DETECTION_IMPLEMENTATION.md
+SCHEDULE_PAGINATION_IMPLEMENTATION.md
+MEDIAPIPE_INSIGHTFACE_INTEGRATION.md
+FACE_RECOGNITION_SIMPLIFIED.md
+FACE_RECOGNITION_ARCHITECTURE.md
+
+# HTML/JS debug files
+debug-*.html
+debug*.html
+debug*.js
+
+# Backend test and utility scripts
+backend/*.py
+!backend/app/**/*.py
+!backend/alembic/**/*.py
+
+# Reserved for optional local tooling rules
+# (intentionally left blank after removing Codacy-specific entries)
+
+# Ignore all .md files except README.md
+*.md
+!README.md
+
+# Ignore PowerShell scripts
+*.ps1
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+*.pem

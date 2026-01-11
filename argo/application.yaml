@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ai-attendance-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/menaceXnadin/Ai-Attendance-Management-System.git' # Replace with actual repo URL
+    targetRevision: HEAD
+    path: helm/ai-attendance
+    helm:
+      valueFiles:
+        - ../values-prod.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: ai-attendance-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
