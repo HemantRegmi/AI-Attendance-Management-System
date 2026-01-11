@@ -18,7 +18,7 @@ backend:
     - name: SECRET_KEY
       value: "super-secret-key-change-me"
     - name: ALLOWED_ORIGINS
-      value: "*"
+      value: '["*"]'
 
 frontend:
   replicaCount: 1
