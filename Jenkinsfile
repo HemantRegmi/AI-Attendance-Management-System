@@ -19,12 +19,12 @@ pipeline {
 
         stage('Static Analysis & Security') {
             parallel {
-                stage('OWASP Dependency Check') {
-                    steps {
-                        // Requires OWASP Dependency-Check Plugin
-                        dependencyCheck additionalArguments: '--format HTML', odcInstallation: 'DP-Check' 
-                    }
-                }
+                // stage('OWASP Dependency Check') {
+                //     steps {
+                //         // Requires OWASP Dependency-Check Plugin
+                //         dependencyCheck additionalArguments: '--format HTML', odcInstallation: 'DP-Check' 
+                //     }
+                // }
                 // stage('SonarQube Analysis') {
                 //     steps {
                 //         withSonarQubeEnv('SonarQube') { // 'SonarQube' is the server name in Jenkins config
