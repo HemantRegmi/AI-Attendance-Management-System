@@ -85,29 +85,23 @@ pipeline {
                         // 1. Copy Helm Chart to Server
                         sh "scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r ./helm ubuntu@${remoteIp}:/home/ubuntu/"
                         
-                        // 2. Zero-Scale Deployment (The "Potato Server" Strategy)
-                        // Step A: Deploy with 0 replicas. This only writes the API objects (fast) and starts NO pods.
+                        // 3. The "Fire and Forget" Strategy (K3s Auto-Deploy)
+                        // K3s automatically watches /var/lib/rancher/k3s/server/manifests/
+                        // If we drop a file there, K3s applies it internally (Bypassing HTTP/API/Kubectl timeouts).
                         sh """
-                            ${sshCmd} 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml && \
-                            echo "--- Deploying Configs (0 Replicas) ---" && \
+                            # 1. Generate the Manifest File Locally on Jenkins
                             /usr/local/bin/helm template ai-attendance-dev ./helm/ai-attendance \
                             -f ./helm/values-dev.yaml \
                             --set backend.image.tag=${BUILD_NUMBER} \
                             --set frontend.image.tag=${BUILD_NUMBER} \
-                            --set backend.replicaCount=0 \
-                            --set frontend.replicaCount=0 \
-                            --namespace ai-attendance-dev --create-namespace | \
-                            /usr/local/bin/kubectl apply --validate=false --request-timeout=5m -f -'
-                        """
-
-                        // Step B: Scale Up Sequentially (Prevents CPU/RAM Spike)
-                        sh """
-                            ${sshCmd} 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml && \
-                            echo "--- Scaling Backend to 1 ---" && \
-                            /usr/local/bin/kubectl scale deployment ai-attendance-dev-backend --replicas=1 -n ai-attendance-dev && \
-                            sleep 15 && \
-                            echo "--- Scaling Frontend to 1 ---" && \
-                            /usr/local/bin/kubectl scale deployment ai-attendance-dev-frontend --replicas=1 -n ai-attendance-dev'
+                            --namespace ai-attendance-dev --create-namespace > ai-attendance.yaml
+                            
+                            # 2. SCP the file to the server (tmp location first)
+                            scp -o StrictHostKeyChecking=no -i ${SSH_KEY} ai-attendance.yaml ubuntu@${remoteIp}:/tmp/ai-attendance.yaml
+                            
+                            # 3. Move it to the Auto-Deploy folder (Sudo required)
+                            # This returns instantly. K3s will pick it up asynchronously.
+                            ${sshCmd} 'sudo mv /tmp/ai-attendance.yaml /var/lib/rancher/k3s/server/manifests/ai-attendance-dev.yaml'
                         """
                     }
                 }
