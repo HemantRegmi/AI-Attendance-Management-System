@@ -4,22 +4,30 @@ backend:
   replicaCount: 2
   image:
     repository: hemantr1/ai-attendance-backend
+    tag: latest
+    pullPolicy: Always
+  service:
+    type: NodePort
+    port: 8000
+    nodePort: 30003
   env:
-    - name: ENV
-      value: "test"
-    - name: DATABASE_URL
-      value: "sqlite+aiosqlite:///./test.db"
-    - name: DATABASE_URL_SYNC
-      value: "sqlite:///./test.db"
-    - name: SECRET_KEY
-      value: "super-secret-key-test"
-    - name: ALLOWED_ORIGINS
-      value: '["*"]'
+    ENV: "testing"
+    DEBUG: "true"
+    DATABASE_URL: "sqlite+aiosqlite:///./test.db"
+    DATABASE_URL_SYNC: "sqlite:///./test.db"
+    SECRET_KEY: "super-secret-key-change-me"
+    ALLOWED_ORIGINS: '["*"]'
 
 frontend:
   replicaCount: 2
   image:
     repository: hemantr1/ai-attendance-frontend
+    tag: latest
+    pullPolicy: Always
+  service:
+    type: NodePort
+    port: 80
+    nodePort: 30002
 
 ingress:
   enabled: true

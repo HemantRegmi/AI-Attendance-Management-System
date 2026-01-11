@@ -5,15 +5,25 @@ from sqlalchemy import create_engine
 from app.core.config import settings
 
 # Async engine for FastAPI
+engine_args = {
+    "echo": settings.debug,
+    "future": True,
+}
+
+# Only apply pooling arguments for non-SQLite databases (e.g., PostgreSQL)
+# SQLite with aiosqlite/NullPool does not support these arguments.
+if "sqlite" not in settings.database_url:
+    engine_args.update({
+        "pool_size": 10,
+        "max_overflow": 20,
+        "pool_timeout": 30,
+        "pool_recycle": 3600,
+        "pool_pre_ping": True
+    })
+
 async_engine = create_async_engine(
     settings.database_url,
-    echo=settings.debug,
-    future=True,
-    pool_size=10,
-    max_overflow=20,
-    pool_timeout=30,
-    pool_recycle=3600,
-    pool_pre_ping=True
+    **engine_args
 )
 
 # Sync engine for Alembic migrations

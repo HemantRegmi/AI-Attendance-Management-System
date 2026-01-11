@@ -10,23 +10,31 @@ backend:
       cpu: 200m
       memory: 256Mi
   env:
-    - name: ENV
-      value: "production"
-    - name: DATABASE_URL
-      value: "sqlite+aiosqlite:///./prod.db"
-    - name: DATABASE_URL_SYNC
-      value: "sqlite:///./prod.db"
-    - name: SECRET_KEY
-      value: "super-secure-production-key"
-    - name: ALLOWED_ORIGINS
-      value: '["*"]'
+    ENV: "production"
+    DEBUG: "false"
+    DATABASE_URL: "sqlite+aiosqlite:///./prod.db"
+    DATABASE_URL_SYNC: "sqlite:///./prod.db"
+    SECRET_KEY: "prod-secret-key-change-me"
+    ALLOWED_ORIGINS: '["*"]'
   image:
     repository: hemantr1/ai-attendance-backend
+    tag: latest
+    pullPolicy: Always
+  service:
+    type: NodePort
+    port: 8000
+    nodePort: 30005
 
 frontend:
   replicaCount: 3
   image:
     repository: hemantr1/ai-attendance-frontend
+    tag: latest
+    pullPolicy: Always
+  service:
+    type: NodePort
+    port: 80
+    nodePort: 30004
   resources:
     requests:
       cpu: 50m

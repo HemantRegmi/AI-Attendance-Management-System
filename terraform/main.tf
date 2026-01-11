@@ -95,7 +95,7 @@ resource "local_file" "ssh_key" {
 # --- Jenkins Server (Existing) ---
 resource "aws_instance" "jenkins_server" {
   ami             = data.aws_ami.ubuntu.id
-  instance_type   = "t3.micro"
+  instance_type   = "t3.small"
   key_name        = aws_key_pair.kp.key_name
   security_groups = [aws_security_group.jenkins_sg.name]
 
@@ -109,6 +109,11 @@ resource "aws_instance" "jenkins_server" {
   tags = {
     Name = "Jenkins-Server"
   }
+}
+
+resource "aws_eip" "jenkins_eip" {
+  instance = aws_instance.jenkins_server.id
+  domain   = "vpc"
 }
 
 # --- K8s & Sonar Server (New) ---
@@ -131,7 +136,7 @@ resource "aws_instance" "k8s_server" {
 }
 
 output "jenkins_url" {
-  value = "http://${aws_instance.jenkins_server.public_ip}:8080"
+  value = "http://${aws_eip.jenkins_eip.public_ip}:8080"
 }
 
 output "sonarqube_url" {
@@ -139,7 +144,7 @@ output "sonarqube_url" {
 }
 
 output "ssh_jenkins" {
-  value = "ssh -i myKey.pem ubuntu@${aws_instance.jenkins_server.public_ip}"
+  value = "ssh -i myKey.pem ubuntu@${aws_eip.jenkins_eip.public_ip}"
 }
 
 output "ssh_k8s" {
