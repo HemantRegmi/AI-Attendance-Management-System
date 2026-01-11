@@ -85,11 +85,16 @@ pipeline {
                         // 1. Copy Helm Chart to Server
                         sh "scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r ./helm ubuntu@${remoteIp}:/home/ubuntu/"
                         
-                        // 2. Run Helm Template + Kubectl Apply (Bypasses OpenAPI Discovery Timeout)
-                        // The t3.micro API server cannot serve the 4MB OpenAPI schema fast enough for Helm's validation.
-                        // So we render the YAML locally and feed it directly to kubectl, which is much lighter.
+                        // 2. Wipe and Recreate (Required for t3.micro / 1GB RAM)
+                        // A rolling update spins up new pods before killing old ones, depleting RAM and causing Swap/CPU Death Spiral.
+                        // We MUST delete the old pods first to free up space.
                         sh """
                             ${sshCmd} 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml && \
+                            echo "--- Cleaning up old deployments to free RAM ---" && \
+                            /usr/local/bin/kubectl delete deployment --all -n ai-attendance-dev --ignore-not-found --timeout=60s && \
+                            echo "--- Waiting for RAM to settle ---" && \
+                            sleep 15 && \
+                            echo "--- Applying new version ---" && \
                             /usr/local/bin/helm template ai-attendance-dev ./helm/ai-attendance \
                             -f ./helm/values-dev.yaml \
                             --set backend.image.tag=${BUILD_NUMBER} \
