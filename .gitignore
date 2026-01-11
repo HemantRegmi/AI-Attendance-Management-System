@@ -110,3 +110,5 @@ backend/*.py
 *.tfstate
 *.tfstate.backup
 *.pem
+kubeconfig*
+*_config

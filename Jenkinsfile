@@ -77,13 +77,23 @@ pipeline {
                 script {
                     // Deploy using Helm
                     // Assumes kubeconfig is set up or using a credentials plugin
-                    withKubeConfig([credentialsId: 'kube-config-dev']) {
+                        // Deploy using SSH to bypass API Timeouts on t3.micro
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-jenkins', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+                        def remoteIp = "172.31.3.163" // Private IP
+                        def sshCmd = "ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ubuntu@${remoteIp}"
+                        
+                        // 1. Copy Helm Chart to Server
+                        sh "scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r ./helm ubuntu@${remoteIp}:/home/ubuntu/"
+                        
+                        // 2. Run Helm LOCALLY on the server
+                        // We use the local /etc/rancher/k3s/k3s.yaml which is always valid for localhost
                         sh """
-                            helm upgrade --install ai-attendance-dev ./helm/ai-attendance \
+                            ${sshCmd} 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml && \
+                            /usr/local/bin/helm upgrade --install ai-attendance-dev ./helm/ai-attendance \
                             -f ./helm/values-dev.yaml \
                             --set backend.image.tag=${BUILD_NUMBER} \
                             --set frontend.image.tag=${BUILD_NUMBER} \
-                            --namespace ${KUBE_NAMESPACE}-dev --create-namespace
+                            --namespace ${KUBE_NAMESPACE}-dev --create-namespace'
                         """
                     }
                 }

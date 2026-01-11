@@ -82,3 +82,7 @@ A full-stack attendance system using facial recognition, built with React (Vite,
 ## Testing
 
 - Test files are included for backend and frontend to ensure code quality and reliability.
+
+
+
+

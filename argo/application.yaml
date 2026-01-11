@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/menaceXnadin/Ai-Attendance-Management-System.git' # Replace with actual repo URL
+    repoURL: 'https://github.com/HemantRegmi/AI-Attendance-Management-System.git' # Replace with actual repo URL
     targetRevision: HEAD
     path: helm/ai-attendance
     helm:

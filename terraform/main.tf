@@ -37,6 +37,14 @@ resource "aws_security_group" "jenkins_sg" {
   }
 
   ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTP Web Traffic"
+  }
+
+  ingress {
     from_port   = 9000
     to_port     = 9000
     protocol    = "tcp"
@@ -84,6 +92,11 @@ resource "aws_instance" "jenkins_server" {
   security_groups = [aws_security_group.jenkins_sg.name]
 
   user_data = file("${path.module}/install_jenkins.sh")
+
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
 
   tags = {
     Name = "Jenkins-Server"
