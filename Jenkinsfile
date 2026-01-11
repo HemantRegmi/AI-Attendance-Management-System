@@ -90,41 +90,41 @@ pipeline {
             }
         }
 
-        stage('Deploy to Test') {
-            // Triggered manually or after successful Dev deployment
-            input {
-                message "Deploy to Test?"
-                ok "Deploy"
-            }
-            steps {
-                withKubeConfig([credentialsId: 'kube-config-test']) {
-                    sh """
-                        helm upgrade --install ai-attendance-test ./helm/ai-attendance \
-                        -f ./helm/values-test.yaml \
-                        --set backend.image.tag=${BUILD_NUMBER} \
-                        --set frontend.image.tag=${BUILD_NUMBER} \
-                        --namespace ${KUBE_NAMESPACE}-test --create-namespace
-                    """
-                }
-            }
-        }
+        // stage('Deploy to Test') {
+        //     // Triggered manually or after successful Dev deployment
+        //     input {
+        //         message "Deploy to Test?"
+        //         ok "Deploy"
+        //     }
+        //     steps {
+        //         withKubeConfig([credentialsId: 'kube-config-test']) {
+        //             sh """
+        //                 helm upgrade --install ai-attendance-test ./helm/ai-attendance \
+        //                 -f ./helm/values-test.yaml \
+        //                 --set backend.image.tag=${BUILD_NUMBER} \
+        //                 --set frontend.image.tag=${BUILD_NUMBER} \
+        //                 --namespace ${KUBE_NAMESPACE}-test --create-namespace
+        //             """
+        //         }
+        //     }
+        // }
 
-        stage('Deploy to Prod') {
-             input {
-                message "Deploy to Production?"
-                ok "Deploy"
-            }
-            steps {
-                withKubeConfig([credentialsId: 'kube-config-prod']) {
-                    sh """
-                        helm upgrade --install ai-attendance-prod ./helm/ai-attendance \
-                        -f ./helm/values-prod.yaml \
-                        --set backend.image.tag=${BUILD_NUMBER} \
-                        --set frontend.image.tag=${BUILD_NUMBER} \
-                        --namespace ${KUBE_NAMESPACE}-prod --create-namespace
-                    """
-                }
-            }
-        }
+        // stage('Deploy to Prod') {
+        //      input {
+        //         message "Deploy to Production?"
+        //         ok "Deploy"
+        //     }
+        //     steps {
+        //         withKubeConfig([credentialsId: 'kube-config-prod']) {
+        //             sh """
+        //                 helm upgrade --install ai-attendance-prod ./helm/ai-attendance \
+        //                 -f ./helm/values-prod.yaml \
+        //                 --set backend.image.tag=${BUILD_NUMBER} \
+        //                 --set frontend.image.tag=${BUILD_NUMBER} \
+        //                 --namespace ${KUBE_NAMESPACE}-prod --create-namespace
+        //             """
+        //         }
+        //     }
+        // }
     }
 }
