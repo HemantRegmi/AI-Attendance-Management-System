@@ -85,22 +85,29 @@ pipeline {
                         // 1. Copy Helm Chart to Server
                         sh "scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r ./helm ubuntu@${remoteIp}:/home/ubuntu/"
                         
-                        // 2. Wipe and Recreate (Required for t3.micro / 1GB RAM)
-                        // A rolling update spins up new pods before killing old ones, depleting RAM and causing Swap/CPU Death Spiral.
-                        // We MUST delete the old pods first to free up space.
+                        // 2. Zero-Scale Deployment (The "Potato Server" Strategy)
+                        // Step A: Deploy with 0 replicas. This only writes the API objects (fast) and starts NO pods.
                         sh """
                             ${sshCmd} 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml && \
-                            echo "--- Cleaning up old deployments to free RAM ---" && \
-                            /usr/local/bin/kubectl delete deployment --all -n ai-attendance-dev --ignore-not-found --timeout=60s && \
-                            echo "--- Waiting for RAM to settle ---" && \
-                            sleep 15 && \
-                            echo "--- Applying new version ---" && \
+                            echo "--- Deploying Configs (0 Replicas) ---" && \
                             /usr/local/bin/helm template ai-attendance-dev ./helm/ai-attendance \
                             -f ./helm/values-dev.yaml \
                             --set backend.image.tag=${BUILD_NUMBER} \
                             --set frontend.image.tag=${BUILD_NUMBER} \
+                            --set backend.replicaCount=0 \
+                            --set frontend.replicaCount=0 \
                             --namespace ai-attendance-dev --create-namespace | \
                             /usr/local/bin/kubectl apply --validate=false --request-timeout=5m -f -'
+                        """
+
+                        // Step B: Scale Up Sequentially (Prevents CPU/RAM Spike)
+                        sh """
+                            ${sshCmd} 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml && \
+                            echo "--- Scaling Backend to 1 ---" && \
+                            /usr/local/bin/kubectl scale deployment ai-attendance-dev-backend --replicas=1 -n ai-attendance-dev && \
+                            sleep 15 && \
+                            echo "--- Scaling Frontend to 1 ---" && \
+                            /usr/local/bin/kubectl scale deployment ai-attendance-dev-frontend --replicas=1 -n ai-attendance-dev'
                         """
                     }
                 }
