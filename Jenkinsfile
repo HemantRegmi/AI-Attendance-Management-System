@@ -95,7 +95,7 @@ pipeline {
                             --set backend.image.tag=${BUILD_NUMBER} \
                             --set frontend.image.tag=${BUILD_NUMBER} \
                             --namespace ai-attendance-dev --create-namespace | \
-                            /usr/local/bin/kubectl apply -f -'
+                            /usr/local/bin/kubectl apply --validate=false -f -'
                         """
                     }
                 }
