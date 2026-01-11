@@ -36,6 +36,22 @@ resource "aws_security_group" "jenkins_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 9000
+    to_port     = 9000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "SonarQube"
+  }
+
+  ingress {
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Kubernetes API"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -60,9 +76,10 @@ resource "local_file" "ssh_key" {
   file_permission = "0400"
 }
 
+# --- Jenkins Server (Existing) ---
 resource "aws_instance" "jenkins_server" {
   ami             = data.aws_ami.ubuntu.id
-  instance_type   = "t3.micro" # Alternative Free Tier eligible
+  instance_type   = "t3.micro"
   key_name        = aws_key_pair.kp.key_name
   security_groups = [aws_security_group.jenkins_sg.name]
 
@@ -73,10 +90,37 @@ resource "aws_instance" "jenkins_server" {
   }
 }
 
+# --- K8s & Sonar Server (New) ---
+resource "aws_instance" "k8s_server" {
+  ami             = data.aws_ami.ubuntu.id
+  instance_type   = "t3.micro" # Free Tier (with Swap)
+  key_name        = aws_key_pair.kp.key_name
+  security_groups = [aws_security_group.jenkins_sg.name]
+
+  root_block_device {
+    volume_size = 20 # Increase to 20GB (8GB default is too small for Swap+Sonar+K8s)
+    volume_type = "gp3"
+  }
+
+  user_data = file("${path.module}/install_k8s_sonar.sh")
+
+  tags = {
+    Name = "K8s-Sonar-Server"
+  }
+}
+
 output "jenkins_url" {
   value = "http://${aws_instance.jenkins_server.public_ip}:8080"
 }
 
-output "ssh_connection" {
+output "sonarqube_url" {
+  value = "http://${aws_instance.k8s_server.public_ip}:9000"
+}
+
+output "ssh_jenkins" {
   value = "ssh -i myKey.pem ubuntu@${aws_instance.jenkins_server.public_ip}"
+}
+
+output "ssh_k8s" {
+  value = "ssh -i myKey.pem ubuntu@${aws_instance.k8s_server.public_ip}"
 }
