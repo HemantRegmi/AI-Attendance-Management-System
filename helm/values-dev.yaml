@@ -3,7 +3,7 @@
 backend:
   replicaCount: 1
   image:
-    repository: hemantregmi/ai-attendance-backend
+    repository: hemantr1/ai-attendance-backend
   service:
     type: NodePort
   env:
@@ -15,7 +15,7 @@ backend:
 frontend:
   replicaCount: 1
   image:
-    repository: hemantregmi/ai-attendance-frontend
+    repository: hemantr1/ai-attendance-frontend
   service:
     type: NodePort
 
