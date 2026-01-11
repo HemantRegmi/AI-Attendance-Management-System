@@ -21,7 +21,6 @@ The system is deployed on AWS using a highly available architecture involving a 
 ---
 
 ## 🚀 Deployment Status
-
 The application is successfully deployed and running in the production environment. All microservices are active across Dev, Test, and Prod namespaces.
 
 **Live System Verification:**
