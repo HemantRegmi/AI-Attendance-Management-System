@@ -93,7 +93,7 @@ resource "aws_instance" "jenkins_server" {
 # --- K8s & Sonar Server (New) ---
 resource "aws_instance" "k8s_server" {
   ami             = data.aws_ami.ubuntu.id
-  instance_type   = "t3.micro" # Free Tier (with Swap)
+  instance_type   = "t3.micro" # Reverted to Free Tier (Strict limit)
   key_name        = aws_key_pair.kp.key_name
   security_groups = [aws_security_group.jenkins_sg.name]
 

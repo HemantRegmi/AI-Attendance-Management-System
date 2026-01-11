@@ -25,15 +25,15 @@ pipeline {
                         dependencyCheck additionalArguments: '--format HTML', odcInstallation: 'DP-Check' 
                     }
                 }
-                stage('SonarQube Analysis') {
-                    steps {
-                        withSonarQubeEnv('SonarQube') { // 'SonarQube' is the server name in Jenkins config
-                            sh "${SCANNER_HOME}/bin/sonar-scanner \
-                                -Dsonar.projectKey=ai-attendance \
-                                -Dsonar.sources=."
-                        }
-                    }
-                }
+                // stage('SonarQube Analysis') {
+                //     steps {
+                //         withSonarQubeEnv('SonarQube') { // 'SonarQube' is the server name in Jenkins config
+                //             sh "${SCANNER_HOME}/bin/sonar-scanner \
+                //                 -Dsonar.projectKey=ai-attendance \
+                //                 -Dsonar.sources=."
+                //         }
+                //     }
+                // }
                 stage('Trivy File Scan') {
                     steps {
                          // Assumes Trivy is installed on the agent
