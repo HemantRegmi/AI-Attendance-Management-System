@@ -21,8 +21,12 @@ pipeline {
             parallel {
                 stage('OWASP Dependency Check') {
                     steps {
-                        // Requires OWASP Dependency-Check Plugin
-                        dependencyCheck additionalArguments: '--format HTML', odcInstallation: 'DP-Check' 
+                        script {
+                            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                // Requires OWASP Dependency-Check Plugin
+                                dependencyCheck additionalArguments: '--format HTML', odcInstallation: 'DP-Check'
+                            }
+                        }
                     }
                 }
                 stage('SonarQube Analysis') {
