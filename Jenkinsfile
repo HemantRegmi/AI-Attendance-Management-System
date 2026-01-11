@@ -85,16 +85,17 @@ pipeline {
                         // 1. Copy Helm Chart to Server
                         sh "scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r ./helm ubuntu@${remoteIp}:/home/ubuntu/"
                         
-                        // 2. Run Helm LOCALLY on the server
-                        // We use the local /etc/rancher/k3s/k3s.yaml which is always valid for localhost
+                        // 2. Run Helm Template + Kubectl Apply (Bypasses OpenAPI Discovery Timeout)
+                        // The t3.micro API server cannot serve the 4MB OpenAPI schema fast enough for Helm's validation.
+                        // So we render the YAML locally and feed it directly to kubectl, which is much lighter.
                         sh """
                             ${sshCmd} 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml && \
-                            /usr/local/bin/helm upgrade --install ai-attendance-dev ./helm/ai-attendance \
+                            /usr/local/bin/helm template ai-attendance-dev ./helm/ai-attendance \
                             -f ./helm/values-dev.yaml \
                             --set backend.image.tag=${BUILD_NUMBER} \
                             --set frontend.image.tag=${BUILD_NUMBER} \
-                            --timeout 10m0s \
-                            --namespace ${KUBE_NAMESPACE}-dev --create-namespace'
+                            --namespace ai-attendance-dev --create-namespace | \
+                            /usr/local/bin/kubectl apply -f -'
                         """
                     }
                 }
