@@ -2,12 +2,24 @@
 
 backend:
   replicaCount: 2
+  image:
+    repository: hemantr1/ai-attendance-backend
   env:
     - name: ENV
       value: "test"
+    - name: DATABASE_URL
+      value: "sqlite+aiosqlite:///./test.db"
+    - name: DATABASE_URL_SYNC
+      value: "sqlite:///./test.db"
+    - name: SECRET_KEY
+      value: "super-secret-key-test"
+    - name: ALLOWED_ORIGINS
+      value: '["*"]'
 
 frontend:
   replicaCount: 2
+  image:
+    repository: hemantr1/ai-attendance-frontend
 
 ingress:
   enabled: true

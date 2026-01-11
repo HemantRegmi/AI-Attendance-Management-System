@@ -19,21 +19,21 @@ pipeline {
 
         stage('Static Analysis & Security') {
             parallel {
-                // stage('OWASP Dependency Check') {
-                //     steps {
-                //         // Requires OWASP Dependency-Check Plugin
-                //         dependencyCheck additionalArguments: '--format HTML', odcInstallation: 'DP-Check' 
-                //     }
-                // }
-                // stage('SonarQube Analysis') {
-                //     steps {
-                //         withSonarQubeEnv('SonarQube') { // 'SonarQube' is the server name in Jenkins config
-                //             sh "${SCANNER_HOME}/bin/sonar-scanner \
-                //                 -Dsonar.projectKey=ai-attendance \
-                //                 -Dsonar.sources=."
-                //         }
-                //     }
-                // }
+                stage('OWASP Dependency Check') {
+                    steps {
+                        // Requires OWASP Dependency-Check Plugin
+                        dependencyCheck additionalArguments: '--format HTML', odcInstallation: 'DP-Check' 
+                    }
+                }
+                stage('SonarQube Analysis') {
+                    steps {
+                        withSonarQubeEnv('SonarQube') { // 'SonarQube' is the server name in Jenkins config
+                            sh "${SCANNER_HOME}/bin/sonar-scanner \
+                                -Dsonar.projectKey=ai-attendance \
+                                -Dsonar.sources=."
+                        }
+                    }
+                }
                 stage('Trivy File Scan') {
                     steps {
                          // Assumes Trivy is installed on the agent
@@ -108,41 +108,69 @@ pipeline {
             }
         }
 
-        // stage('Deploy to Test') {
-        //     // Triggered manually or after successful Dev deployment
-        //     input {
-        //         message "Deploy to Test?"
-        //         ok "Deploy"
-        //     }
-        //     steps {
-        //         withKubeConfig([credentialsId: 'kube-config-test']) {
-        //             sh """
-        //                 helm upgrade --install ai-attendance-test ./helm/ai-attendance \
-        //                 -f ./helm/values-test.yaml \
-        //                 --set backend.image.tag=${BUILD_NUMBER} \
-        //                 --set frontend.image.tag=${BUILD_NUMBER} \
-        //                 --namespace ${KUBE_NAMESPACE}-test --create-namespace
-        //             """
-        //         }
-        //     }
-        // }
+        stage('Deploy to Test') {
+            input {
+                message "Deploy to Test?"
+                ok "Deploy"
+            }
+            steps {
+                script {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-jenkins', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+                        def remoteIp = "172.31.3.163" 
+                        def sshCmd = "ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ubuntu@${remoteIp}"
+                        
+                        sh """
+                            /usr/local/bin/helm template ai-attendance-test ./helm/ai-attendance \
+                            -f ./helm/values-test.yaml \
+                            --set backend.image.tag=${BUILD_NUMBER} \
+                            --set frontend.image.tag=${BUILD_NUMBER} \
+                            --namespace ai-attendance-test --create-namespace > ai-attendance-test.yaml
+                            
+                            scp -o StrictHostKeyChecking=no -i ${SSH_KEY} ai-attendance-test.yaml ubuntu@${remoteIp}:/tmp/ai-attendance-test.yaml
+                            ${sshCmd} 'sudo mv /tmp/ai-attendance-test.yaml /var/lib/rancher/k3s/server/manifests/ai-attendance-test.yaml'
+                        """
+                    }
+                }
+            }
+        }
 
-        // stage('Deploy to Prod') {
-        //      input {
-        //         message "Deploy to Production?"
-        //         ok "Deploy"
-        //     }
-        //     steps {
-        //         withKubeConfig([credentialsId: 'kube-config-prod']) {
-        //             sh """
-        //                 helm upgrade --install ai-attendance-prod ./helm/ai-attendance \
-        //                 -f ./helm/values-prod.yaml \
-        //                 --set backend.image.tag=${BUILD_NUMBER} \
-        //                 --set frontend.image.tag=${BUILD_NUMBER} \
-        //                 --namespace ${KUBE_NAMESPACE}-prod --create-namespace
-        //             """
-        //         }
-        //     }
-        // }
+        stage('Deploy to Prod') {
+             input {
+                message "Deploy to Production?"
+                ok "Deploy"
+            }
+            steps {
+                script {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-jenkins', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+                        def remoteIp = "172.31.3.163" 
+                        def sshCmd = "ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ubuntu@${remoteIp}"
+                        
+                        sh """
+                            /usr/local/bin/helm template ai-attendance-prod ./helm/ai-attendance \
+                            -f ./helm/values-prod.yaml \
+                            --set backend.image.tag=${BUILD_NUMBER} \
+                            --set frontend.image.tag=${BUILD_NUMBER} \
+                            --namespace ai-attendance-prod --create-namespace > ai-attendance-prod.yaml
+                            
+                            scp -o StrictHostKeyChecking=no -i ${SSH_KEY} ai-attendance-prod.yaml ubuntu@${remoteIp}:/tmp/ai-attendance-prod.yaml
+                            ${sshCmd} 'sudo mv /tmp/ai-attendance-prod.yaml /var/lib/rancher/k3s/server/manifests/ai-attendance-prod.yaml'
+                        """
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            mail to: 'admin@ai-attendance.com',
+                 subject: "SUCCESS: AI Attendance Build #${env.BUILD_NUMBER}",
+                 body: "Build #${env.BUILD_NUMBER} deployed successfully to Dev. Waiting for Test/Prod approval.\n\nCheck console: ${env.BUILD_URL}"
+        }
+        failure {
+            mail to: 'admin@ai-attendance.com',
+                 subject: "FAILURE: AI Attendance Build #${env.BUILD_NUMBER}",
+                 body: "Build #${env.BUILD_NUMBER} failed.\n\nCheck console: ${env.BUILD_URL}"
+        }
     }
 }

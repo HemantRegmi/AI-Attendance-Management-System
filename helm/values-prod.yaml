@@ -12,9 +12,21 @@ backend:
   env:
     - name: ENV
       value: "production"
+    - name: DATABASE_URL
+      value: "sqlite+aiosqlite:///./prod.db"
+    - name: DATABASE_URL_SYNC
+      value: "sqlite:///./prod.db"
+    - name: SECRET_KEY
+      value: "super-secure-production-key"
+    - name: ALLOWED_ORIGINS
+      value: '["*"]'
+  image:
+    repository: hemantr1/ai-attendance-backend
 
 frontend:
   replicaCount: 3
+  image:
+    repository: hemantr1/ai-attendance-frontend
   resources:
     requests:
       cpu: 50m
