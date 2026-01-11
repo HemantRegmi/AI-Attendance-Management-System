@@ -93,6 +93,7 @@ pipeline {
                             -f ./helm/values-dev.yaml \
                             --set backend.image.tag=${BUILD_NUMBER} \
                             --set frontend.image.tag=${BUILD_NUMBER} \
+                            --timeout 10m0s \
                             --namespace ${KUBE_NAMESPACE}-dev --create-namespace'
                         """
                     }
