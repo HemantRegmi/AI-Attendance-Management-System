@@ -1,88 +1,82 @@
+# AI Attendance Management System
 
-# AttendAI - AI-Powered Attendance Management System
+**AttendAI: The Future of Smart Attendance**
 
-A full-stack attendance system using facial recognition, built with React (Vite, TypeScript) for the frontend and FastAPI (Python) for the backend, with PostgreSQL as the database. InsightFace is used for robust, deep learning-based face recognition.
+AttendAI is a modern, full-stack web application designed to revolutionize classroom attendance tracking through facial recognition technology. Built with a scalable microservices architecture, it leverages Kubernetes for orchestration, Jenkins for CI/CD automation, and AWS for robust cloud infrastructure.
 
-## Features
+## 🏗️ System Architecture
 
-- AI-powered face detection and recognition (InsightFace)
-- Real-time student attendance tracking and analytics
-- Secure JWT-based authentication (admin and student roles)
-- Responsive, modern frontend with React, Vite, and Tailwind CSS
-- RESTful API backend with FastAPI and PostgreSQL
-- Database migrations with Alembic
-- Docker support for easy deployment
+The system is deployed on AWS using a highly available architecture involving a Virtual Private Cloud (VPC), Jenkins for build automation, and a K3s Kubernetes cluster for application hosting.
 
-## Project Structure
+![System Architecture](assets/architecture.png)
 
-- `frontend/`: React + Vite + TypeScript frontend
-- `backend/`: FastAPI backend with InsightFace and PostgreSQL
+### Key Components
+*   **Frontend**: React.js application offering an intuitive dashboard for teachers and students.
+*   **Backend**: FastAPI (Python) service handling business logic and facial recognition processing.
+*   **Database**: PostgreSQL for robust data persistence.
+*   **Infrastructure**: AWS EC2 instances managed via Terraform.
+*   **Orchestration**: K3s (Lightweight Kubernetes) for managing containerized microservices.
+*   **CI/CD**: Jenkins pipeline automating build, test, security scans (SonarQube, Trivy), and deployment.
 
-## Quick Start
+---
 
-### Backend
+## 🚀 Deployment Status
 
-1. Navigate to the backend directory:
-  ```
-  cd backend
-  ```
-2. Create and activate a virtual environment:
-  ```
-  python -m venv venv
-  # Windows:
-  .\venv\Scripts\activate
-  # Linux/Mac:
-  source venv/bin/activate
-  ```
-3. Install dependencies:
-  ```
-  pip install -r requirements.txt
-  ```
-4. Configure environment variables:
-  - Copy `.env.example` to `.env` and update with your settings.
-5. Set up the database:
-  ```
-  createdb ai_attendance_db
-  alembic upgrade head
-  ```
-6. Run the backend server:
-  ```
-  uvicorn app.main:app --reload
-  ```
+The application is successfully deployed and running in the production environment.
 
-### Frontend
+### Application Dashboard
+The user interface provides real-time insights into student attendance.
+![Application UI](assets/app_ui.png)
 
-1. Navigate to the frontend directory:
-  ```
-  cd frontend
-  ```
-2. Install dependencies:
-  ```
-  npm install
-  ```
-3. Run the development server:
-  ```
-  npm run dev
-  ```
-  The frontend will run on http://localhost:5173
+### CI/CD Pipeline
+Our robust Jenkins pipeline ensures every commit is automatically built, scanned, and deployed.
+![Jenkins Pipeline](assets/pipeline.png)
 
-## Tech Stack
+---
 
-- **Frontend:** React, Vite, TypeScript, Tailwind CSS
-- **Backend:** FastAPI, Python, InsightFace, OpenCV, SQLAlchemy, Alembic
-- **Database:** PostgreSQL
-- **Authentication:** JWT (python-jose)
-- **Containerization:** Docker (optional)
+## 🛠️ Infrastructure Overview
 
-## Authentication
+The underlying infrastructure is fully automated using Terraform and runs on AWS EC2 instances.
 
-- Secure JWT-based authentication for all users.
-- Admins can create student accounts and manage attendance.
+### AWS Management Console
+Two key instances power the system:
+1.  **Jenkins-Server**: Handles all build and deployment tasks.
+2.  **K8s-Sonar-Server**: Hosts the Kubernetes cluster and SonarQube quality gate.
 
-## Testing
+![AWS EC2 Console](assets/aws_console.png)
 
-- Test files are included for backend and frontend to ensure code quality and reliability.
+### Docker Registry
+Container images are versioned and stored securely in Docker Hub.
+![Docker Hub](assets/docker_hub.png)
 
+---
 
+## 📋 Features
+*   **Automated Tracking**: Eliminates manual roll calls using AI/ML.
+*   **Real-time Analytics**: Instant visibility into attendance trends.
+*   **Secure**: Role-based access control and encrypted data transmission.
+*   **Scalable**: Designed to handle growing student and class numbers effortlessly.
 
+## 🔧 Setup & Installation
 
+### Prerequisites
+*   AWS Account
+*   Terraform installed
+*   Docker & Kubernetes (kubectl)
+
+### Quick Start
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/hemantr1/AI-Attendance-Management-System.git
+    ```
+2.  **Provision Infrastructure**:
+    ```bash
+    cd terraform
+    terraform init
+    terraform apply --auto-approve
+    ```
+3.  **Deploy Application**:
+    The Jenkins pipeline will automatically trigger upon push, handling the deployment to the Kubernetes cluster.
+
+---
+*Built with ❤️ by the AttendAI Team*
