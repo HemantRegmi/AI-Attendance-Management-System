@@ -27,10 +27,13 @@ pipeline {
                 }
                 stage('SonarQube Analysis') {
                     steps {
-                        withSonarQubeEnv('SonarQube') { // 'SonarQube' is the server name in Jenkins config
-                            sh "${SCANNER_HOME}/bin/sonar-scanner \
-                                -Dsonar.projectKey=ai-attendance \
-                                -Dsonar.sources=."
+                        script {
+                            def scannerHome = tool 'SonarScanner' // Must match Global Tool Config Name
+                            withSonarQubeEnv('SonarQube') {
+                                sh "${scannerHome}/bin/sonar-scanner \
+                                    -Dsonar.projectKey=ai-attendance \
+                                    -Dsonar.sources=."
+                            }
                         }
                     }
                 }
