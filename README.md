@@ -79,4 +79,4 @@ Container images are versioned and stored securely in Docker Hub.
     The Jenkins pipeline will automatically trigger upon push, handling the deployment to the Kubernetes cluster.
 
 ---
-*Built with ❤️ by the AttendAI Team*
+
