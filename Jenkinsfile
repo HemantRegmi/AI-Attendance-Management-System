@@ -47,14 +47,15 @@ pipeline {
             steps {
                 script {
                     // Build Backend
-                    docker.withRegistry("https://${DOCKER_REGISTRY}", 'docker-credentials-id') {
+                    // Use empty string registry URL to default to Docker Hub (index.docker.io)
+                    docker.withRegistry('', 'docker-credentials-id') {
                         def backendImage = docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME_BACKEND}:${BUILD_NUMBER}", "./backend")
                         backendImage.push()
                         backendImage.push("latest")
                     }
 
                     // Build Frontend
-                    docker.withRegistry("https://${DOCKER_REGISTRY}", 'docker-credentials-id') {
+                    docker.withRegistry('', 'docker-credentials-id') {
                         def frontendImage = docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME_FRONTEND}:${BUILD_NUMBER}", "./frontend")
                         frontendImage.push()
                         frontendImage.push("latest")
