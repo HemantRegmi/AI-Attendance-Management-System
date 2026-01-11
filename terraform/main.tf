@@ -60,6 +60,14 @@ resource "aws_security_group" "jenkins_sg" {
     description = "Kubernetes API"
   }
 
+  ingress {
+    from_port   = 30000
+    to_port     = 32767
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "K8s NodePorts"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -106,7 +114,7 @@ resource "aws_instance" "jenkins_server" {
 # --- K8s & Sonar Server (New) ---
 resource "aws_instance" "k8s_server" {
   ami             = data.aws_ami.ubuntu.id
-  instance_type   = "t3.micro" # Reverted to Free Tier (Strict limit)
+  instance_type   = "m7i-flex.large" # User confirmed Free Tier Eligible (8GB RAM) 
   key_name        = aws_key_pair.kp.key_name
   security_groups = [aws_security_group.jenkins_sg.name]
 

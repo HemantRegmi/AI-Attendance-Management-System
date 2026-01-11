@@ -163,12 +163,12 @@ pipeline {
     
     post {
         success {
-            mail to: 'admin@ai-attendance.com',
+            mail to: 'hregmi2060@gmail.com',
                  subject: "SUCCESS: AI Attendance Build #${env.BUILD_NUMBER}",
                  body: "Build #${env.BUILD_NUMBER} deployed successfully to Dev. Waiting for Test/Prod approval.\n\nCheck console: ${env.BUILD_URL}"
         }
         failure {
-            mail to: 'admin@ai-attendance.com',
+            mail to: 'hregmi2060@gmail.com',
                  subject: "FAILURE: AI Attendance Build #${env.BUILD_NUMBER}",
                  body: "Build #${env.BUILD_NUMBER} failed.\n\nCheck console: ${env.BUILD_URL}"
         }

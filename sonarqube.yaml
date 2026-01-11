@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarqube
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarqube
+  template:
+    metadata:
+      labels:
+        app: sonarqube
+    spec:
+      containers:
+      - name: sonarqube
+        image: sonarqube:lts-community
+        ports:
+        - containerPort: 9000
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
+        env:
+        - name: SONAR_ES_BOOTSTRAP_CHECKS_DISABLE
+          value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sonarqube
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: sonarqube
+  ports:
+  - port: 9000
+    targetPort: 9000
+    nodePort: 30900
