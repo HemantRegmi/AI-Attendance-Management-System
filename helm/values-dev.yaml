@@ -11,6 +11,14 @@ backend:
       value: "development"
     - name: DEBUG
       value: "true"
+    - name: DATABASE_URL
+      value: "sqlite+aiosqlite:///./test.db"
+    - name: DATABASE_URL_SYNC
+      value: "sqlite:///./test.db"
+    - name: SECRET_KEY
+      value: "super-secret-key-change-me"
+    - name: ALLOWED_ORIGINS
+      value: "*"
 
 frontend:
   replicaCount: 1
