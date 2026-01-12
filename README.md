@@ -35,6 +35,11 @@ The user interface provides real-time insights into student attendance.
 Our robust Jenkins pipeline ensures every commit is automatically built, scanned, and deployed.
 ![Jenkins Pipeline](assets/pipeline.png)
 
+#### Email Notifications
+The system provides instant feedback on build success or failure via email.
+![Build Success](assets/email_success.png)
+![Build Failure](assets/email_failure.png)
+
 ---
 
 ## 🛠️ Infrastructure Overview
