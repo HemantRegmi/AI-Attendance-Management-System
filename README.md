@@ -21,11 +21,12 @@ The system is deployed on AWS using a highly available architecture involving a 
 ---
 
 ## 🚀 Deployment Status
-
 The application is successfully deployed and running in the production environment. All microservices are active across Dev, Test, and Prod namespaces.
 
-**Live System Verification:**
-![Kubernetes Pods Status](assets/k8s_pods.png)
+
+
+<img width="764" height="594" alt="Screenshot 2026-01-12 021429" src="https://github.com/user-attachments/assets/bd0e6e6b-cb21-4f8d-89f7-714b08f61052" />
+
 
 ### Application Dashboard
 The user interface provides real-time insights into student attendance.
